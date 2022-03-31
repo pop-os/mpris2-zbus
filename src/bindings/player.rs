@@ -59,7 +59,7 @@ trait Player {
 
 	/// Seeked signal
 	#[dbus_proxy(signal)]
-	fn seeked(&self, Position: i64) -> zbus::Result<()>;
+	fn seeked(&self, position: i64) -> zbus::Result<()>;
 
 	/// CanControl property
 	#[dbus_proxy(property)]
