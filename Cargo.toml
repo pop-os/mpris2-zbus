@@ -8,3 +8,7 @@ license = "MPL-2.0"
 [dependencies]
 thiserror = "1.0.30"
 zbus = "2.1.1"
+
+[dev-dependencies]
+miette = { version = "4.3.0", features = ["fancy"] }
+tokio = { version = "1.17.0", features = ["full"] }

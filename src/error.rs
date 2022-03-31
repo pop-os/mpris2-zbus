@@ -7,7 +7,7 @@ pub enum Error {
 		expected: &'static [&'static str],
 	},
 	#[error("zbus error: {0}")]
-	Zbus(#[from] zbus::Error),
+	Zbus(zbus::Error),
 
 	#[error("zbus fdo error: {0}")]
 	Fdo(zbus::fdo::Error),
@@ -18,6 +18,15 @@ impl From<zbus::fdo::Error> for Error {
 		match err {
 			zbus::fdo::Error::ZBus(err) => Self::Zbus(err),
 			_ => Self::Fdo(err),
+		}
+	}
+}
+
+impl From<zbus::Error> for Error {
+	fn from(err: zbus::Error) -> Self {
+		match err {
+			zbus::Error::FDO(err) => Self::Fdo(*err),
+			_ => Self::Zbus(err),
 		}
 	}
 }

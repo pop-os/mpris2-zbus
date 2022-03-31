@@ -1,6 +1,7 @@
 use crate::{
 	bindings::{media_player::MediaPlayer2Proxy, player::PlayerProxy},
 	error::{Error, Result},
+	handle_optional,
 	media_player::MediaPlayer,
 };
 use std::{
@@ -57,12 +58,15 @@ impl Player {
 	}
 
 	/// How far into the current track the player is.
-	pub async fn position(&self) -> Result<Duration> {
-		self.proxy
-			.position()
-			.await
-			.map(|micros| Duration::from_micros(micros as u64))
-			.map_err(Error::from)
+	///
+	/// Not all players support this, and it will return None if this is the case.
+	pub async fn position(&self) -> Result<Option<Duration>> {
+		handle_optional(
+			self.proxy
+				.position()
+				.await
+				.map(|micros| Duration::from_micros(micros as u64)),
+		)
 	}
 
 	/// Gets the current playback status of the player.
