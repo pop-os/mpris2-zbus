@@ -78,9 +78,32 @@ impl Player {
 			.and_then(|status| PlaybackStatus::from_str(&status))
 	}
 
+	/// Returns the current rate of playback.
+	pub async fn rate(&self) -> Result<Option<f64>> {
+		handle_optional(self.proxy.rate().await)
+	}
+
+	/// Returns the minimum supported rate for the player.
+	pub async fn minimum_rate(&self) -> Result<Option<f64>> {
+		handle_optional(self.proxy.minimum_rate().await)
+	}
+
+	/// Returns the minimum supported rate for the player.
+	pub async fn maximum_rate(&self) -> Result<Option<f64>> {
+		handle_optional(self.proxy.maximum_rate().await)
+	}
+
 	/// Returns the range of playback rates available for the player.
-	pub async fn available_rates(&self) -> Result<std::ops::RangeInclusive<f64>> {
-		Ok(self.proxy.minimum_rate().await?..=self.proxy.maximum_rate().await?)
+	pub async fn available_rates(&self) -> Result<Option<std::ops::RangeInclusive<f64>>> {
+		let minimum = match self.minimum_rate().await? {
+			Some(min) => min,
+			None => return Ok(None),
+		};
+		let maximum = match self.maximum_rate().await? {
+			Some(max) => max,
+			None => return Ok(None),
+		};
+		Ok(Some(minimum..=maximum))
 	}
 }
 

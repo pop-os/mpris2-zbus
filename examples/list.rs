@@ -45,6 +45,32 @@ async fn main() -> Result<()> {
 			.map(|s| format!("{} seconds", s.as_secs_f32()))
 			.unwrap_or_else(|| "N/A".to_owned());
 		println!("\tPosition: {}", position);
+		if !player
+			.can_seek()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| format!("Failed to get can_seek for media player '{}'", name))?
+		{
+			println!("\tDoesn't support seeking");
+		} else {
+			println!("\tSupports seeking");
+		}
+		let supported_rates = player
+			.available_rates()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| format!("Failed to get supported rates for media player '{}'", name))?
+			.map(|s| format!("{}x through {}x", s.start(), s.end()))
+			.unwrap_or_else(|| "N/A".to_owned());
+		println!("\tSupported Rates: {}", supported_rates);
+		let current_rate = player
+			.rate()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| format!("Failed to get current rate for media player '{}'", name))?
+			.map(|s| format!("{}x", s))
+			.unwrap_or_else(|| "N/A".to_owned());
+		println!("\tCurrent Rate: {}", current_rate);
 	}
 	Ok(())
 }
