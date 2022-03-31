@@ -79,21 +79,29 @@ impl Player {
 	}
 
 	/// Returns the current rate of playback.
+	///
+	/// Not all players support this, and it will return None if this is the case.
 	pub async fn rate(&self) -> Result<Option<f64>> {
 		handle_optional(self.proxy.rate().await)
 	}
 
 	/// Returns the minimum supported rate for the player.
+	///
+	/// Not all players support this, and it will return None if this is the case.
 	pub async fn minimum_rate(&self) -> Result<Option<f64>> {
 		handle_optional(self.proxy.minimum_rate().await)
 	}
 
 	/// Returns the minimum supported rate for the player.
+	///
+	/// Not all players support this, and it will return None if this is the case.
 	pub async fn maximum_rate(&self) -> Result<Option<f64>> {
 		handle_optional(self.proxy.maximum_rate().await)
 	}
 
 	/// Returns the range of playback rates available for the player.
+	///
+	/// Not all players support this, and it will return None if this is the case.
 	pub async fn available_rates(&self) -> Result<Option<std::ops::RangeInclusive<f64>>> {
 		let minimum = match self.minimum_rate().await? {
 			Some(min) => min,
