@@ -6,6 +6,7 @@ use crate::{
 use std::ops::Deref;
 use zbus::{fdo::DBusProxy, names::OwnedBusName, Connection};
 
+#[derive(Debug, Clone)]
 pub struct MediaPlayer {
 	proxy: MediaPlayer2Proxy<'static>,
 }

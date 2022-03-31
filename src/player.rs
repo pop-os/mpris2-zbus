@@ -11,6 +11,7 @@ use std::{
 };
 use zbus::{names::OwnedBusName, Connection};
 
+#[derive(Debug, Clone)]
 pub struct Player {
 	proxy: PlayerProxy<'static>,
 }
