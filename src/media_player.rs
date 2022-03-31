@@ -1,21 +1,24 @@
 use crate::{
 	bindings::{media_player::MediaPlayer2Proxy, player::PlayerProxy},
+	error::{Error, Result},
 	player::Player,
 };
 use std::ops::Deref;
-use zbus::{fdo::DBusProxy, names::OwnedBusName, Connection, Result};
+use zbus::{fdo::DBusProxy, names::OwnedBusName, Connection};
 
 pub struct MediaPlayer {
 	proxy: MediaPlayer2Proxy<'static>,
 }
 
 impl MediaPlayer {
+	/// Creates a new instance of the `org.mpris.MediaPlayer2` interface.
 	pub async fn new(connection: &Connection, name: OwnedBusName) -> Result<Self> {
-		let proxy = MediaPlayer2Proxy::builder(connection)
+		MediaPlayer2Proxy::builder(connection)
 			.destination(name)?
 			.build()
-			.await?;
-		Ok(Self { proxy })
+			.await
+			.map(Self::from)
+			.map_err(Error::from)
 	}
 
 	/// Gets the names of all the MPRIS players that are available on the current session.
