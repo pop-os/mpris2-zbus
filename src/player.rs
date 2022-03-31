@@ -10,8 +10,8 @@ use std::{
 	fmt::{self, Display},
 	ops::Deref,
 	str::FromStr,
-	time::Duration,
 };
+use time::Duration;
 use zbus::{names::OwnedBusName, Connection};
 
 #[derive(Debug, Clone)]
@@ -39,20 +39,12 @@ impl Player {
 		Ok(proxy.into())
 	}
 
-	/// Seeks the specified duration forward.
-	pub async fn seek_ahead(&self, duration: Duration) -> Result<bool> {
+	/// Seeks the specified duration.
+	pub async fn seek(&self, duration: Duration) -> Result<bool> {
 		if self.proxy.can_seek().await? {
-			self.proxy.seek(duration.as_micros() as i64).await?;
-			Ok(true)
-		} else {
-			Ok(false)
-		}
-	}
-
-	/// Seeks the specified duration backwards.
-	pub async fn seek_back(&self, duration: Duration) -> Result<bool> {
-		if self.proxy.can_seek().await? {
-			self.proxy.seek(-(duration.as_micros() as i64)).await?;
+			self.proxy
+				.seek(duration.whole_microseconds() as i64)
+				.await?;
 			Ok(true)
 		} else {
 			Ok(false)
@@ -63,12 +55,7 @@ impl Player {
 	///
 	/// Not all players support this, and it will return None if this is the case.
 	pub async fn position(&self) -> Result<Option<Duration>> {
-		handle_optional(
-			self.proxy
-				.position()
-				.await
-				.map(|micros| Duration::from_micros(micros as u64)),
-		)
+		handle_optional(self.proxy.position().await.map(Duration::microseconds))
 	}
 
 	/// Gets the current playback status of the player.
