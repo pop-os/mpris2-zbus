@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 use crate::error::{Error, Result};
 use std::{
 	collections::HashMap,

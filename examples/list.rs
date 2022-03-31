@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 use miette::{IntoDiagnostic, Result, WrapErr};
 use mpris2_zbus::media_player::MediaPlayer;
 use zbus::Connection;

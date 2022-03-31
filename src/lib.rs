@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: MPL-2.0
 pub mod bindings;
 pub mod error;
 pub mod media_player;
-pub mod player;
 pub mod metadata;
+pub mod player;
 
 pub(crate) fn handle_optional<T>(input: zbus::Result<T>) -> error::Result<Option<T>> {
 	match input {

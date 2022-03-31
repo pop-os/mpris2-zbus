@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 use crate::{
 	bindings::{media_player::MediaPlayer2Proxy, player::PlayerProxy},
 	error::{Error, Result},
