@@ -6,9 +6,18 @@ pub enum Error {
 		got: String,
 		expected: &'static [&'static str],
 	},
+
+	#[error("Tried to convert extract a {wanted}, but it was actually {actual}")]
+	IncorrectVariant {
+		wanted: &'static str,
+		actual: &'static str,
+	},
+
+	/// A zbus error.
 	#[error("zbus error: {0}")]
 	Zbus(zbus::Error),
 
+	/// A zbus::fdo error.
 	#[error("zbus fdo error: {0}")]
 	Fdo(zbus::fdo::Error),
 }

@@ -3,6 +3,7 @@ use crate::{
 	error::{Error, Result},
 	handle_optional,
 	media_player::MediaPlayer,
+	metadata::Metadata,
 };
 use std::{
 	fmt::{self, Display},
@@ -112,6 +113,15 @@ impl Player {
 			None => return Ok(None),
 		};
 		Ok(Some(minimum..=maximum))
+	}
+
+	/// Returns the metadata for the player.
+	pub async fn metadata(&self) -> Result<Metadata> {
+		self.proxy
+			.metadata()
+			.await
+			.map(|metadata| metadata.into())
+			.map_err(Error::from)
 	}
 }
 

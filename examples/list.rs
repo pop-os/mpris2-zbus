@@ -71,6 +71,12 @@ async fn main() -> Result<()> {
 			.map(|s| format!("{}x", s))
 			.unwrap_or_else(|| "N/A".to_owned());
 		println!("\tCurrent Rate: {}", current_rate);
+		let metadata = player
+			.metadata()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| format!("Failed to get metadata for media player '{}'", name))?;
+		println!("\tMetadata:\n{}", metadata);
 	}
 	Ok(())
 }
