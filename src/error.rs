@@ -9,10 +9,16 @@ pub enum Error {
 		expected: &'static [&'static str],
 	},
 
-	#[error("Tried to convert extract a {wanted}, but it was actually {actual}")]
+	#[error("Tried to extract a {wanted}, but it was actually {actual}")]
 	IncorrectVariant {
 		wanted: &'static str,
 		actual: &'static str,
+	},
+
+	#[error("Tried to convert Value::{wanted}, but it was got {actual:?}")]
+	IncorrectValue {
+		wanted: &'static str,
+		actual: zvariant::OwnedValue,
 	},
 
 	/// A zbus error.

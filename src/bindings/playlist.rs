@@ -19,7 +19,10 @@
 //!
 //! …consequently `zbus-xmlgen` did not generate code for the above interfaces.
 
-use crate::playlist::{Playlist, PlaylistId};
+use crate::{
+	playlist::{Playlist, PlaylistId},
+	playlists::PlaylistOrdering,
+};
 use zbus::dbus_proxy;
 
 #[dbus_proxy(
@@ -35,7 +38,7 @@ trait Playlists {
 		&self,
 		index: u32,
 		max_count: u32,
-		order: &str,
+		order: PlaylistOrdering,
 		reverse_order: bool,
 	) -> zbus::Result<Vec<Playlist>>;
 

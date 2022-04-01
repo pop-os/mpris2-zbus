@@ -3,12 +3,18 @@ use crate::{
 	bindings::playlist::PlaylistsProxy,
 	error::{Error, Result},
 };
+use serde::{Deserialize, Serialize};
 use std::{
 	fmt::{self, Display},
 	ops::Deref,
 	str::FromStr,
 };
-use zbus::{names::OwnedBusName, Connection};
+use zbus::{
+	names::OwnedBusName,
+	zvariant::{Signature, Type, Value},
+	Connection,
+};
+use zvariant::OwnedValue;
 
 pub struct Playlists {
 	proxy: PlaylistsProxy<'static>,
@@ -40,7 +46,7 @@ impl From<PlaylistsProxy<'static>> for Playlists {
 	}
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PlaylistOrdering {
 	/// Alphabetical ordering by name, ascending.
 	Alphabetical,
@@ -52,6 +58,26 @@ pub enum PlaylistOrdering {
 	LastPlayDate,
 	/// A user-defined ordering.
 	UserDefined,
+}
+
+impl Type for PlaylistOrdering {
+	fn signature() -> zvariant::Signature<'static> {
+		String::signature()
+	}
+}
+
+impl<'a> TryFrom<Value<'a>> for PlaylistOrdering {
+	type Error = Error;
+
+	fn try_from(value: Value<'a>) -> Result<Self> {
+		match value {
+			Value::Str(value) => Self::from_str(&value),
+			_ => Err(Error::IncorrectValue {
+				wanted: "Str",
+				actual: OwnedValue::from(value),
+			}),
+		}
+	}
 }
 
 impl FromStr for PlaylistOrdering {

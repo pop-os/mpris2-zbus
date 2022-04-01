@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: MPL-2.0
 use crate::{
-	bindings::{media_player::MediaPlayer2Proxy, player::PlayerProxy, track_list::TrackListProxy},
+	bindings::{
+		media_player::MediaPlayer2Proxy, player::PlayerProxy, playlist::PlaylistsProxy,
+		track_list::TrackListProxy,
+	},
 	error::{Error, Result},
 	player::Player,
+	playlists::Playlists,
 	track_list::TrackList,
 };
 use std::ops::Deref;
@@ -68,6 +72,22 @@ impl MediaPlayer {
 				.build()
 				.await
 				.map(TrackList::from)
+				.map(Some)
+				.map_err(Error::from)
+		} else {
+			Ok(None)
+		}
+	}
+
+	/// Returns an instance to the `org.mpris.MediaPlayer2.Playlists` interface of this object,
+	/// if a track list is available.
+	pub async fn playlists(&self) -> Result<Option<Playlists>> {
+		if self.proxy.has_track_list().await? {
+			PlaylistsProxy::builder(self.proxy.connection())
+				.destination(self.proxy.destination().to_owned())?
+				.build()
+				.await
+				.map(Playlists::from)
 				.map(Some)
 				.map_err(Error::from)
 		} else {

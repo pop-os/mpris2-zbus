@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 use miette::{IntoDiagnostic, Result, WrapErr};
-use mpris2_zbus::media_player::MediaPlayer;
+use mpris2_zbus::{media_player::MediaPlayer, playlists::PlaylistOrdering};
 use zbus::Connection;
 
 #[tokio::main]
@@ -112,6 +112,44 @@ async fn main() -> Result<()> {
 			}
 		} else {
 			println!("\tTracks: N/A");
+		}
+		let playlists = media_player
+			.playlists()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| {
+				format!(
+					"Failed to get playlists interface for media player '{}'",
+					name
+				)
+			})?;
+		if let Some(playlists) = playlists {
+			println!("\tPlaylists:");
+			let playlist_count = playlists
+				.playlist_count()
+				.await
+				.into_diagnostic()
+				.wrap_err_with(|| {
+					format!("Failed to get playlist count for media player '{}'", name)
+				})?;
+			if playlist_count > 0 {
+				let playlists = playlists
+					.get_playlists(0, playlist_count, PlaylistOrdering::Alphabetical, false)
+					.await
+					.into_diagnostic()
+					.wrap_err_with(|| {
+						format!("Failed to get playlists for media player '{}'", name)
+					})?;
+				for playlist in playlists {
+					println!("\t{}", playlist.id());
+					println!("\t\tName: {}", playlist.name());
+					println!("\t\tIcon: {}", playlist.icon());
+				}
+			} else {
+				println!("\t\t None :(");
+			}
+		} else {
+			println!("\tPlaylists: N/A");
 		}
 	}
 	Ok(())
