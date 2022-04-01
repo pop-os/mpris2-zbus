@@ -5,7 +5,7 @@ use crate::{
 	metadata::Metadata,
 	track::Track,
 };
-use std::ops::Deref;
+use std::{collections::BTreeMap, ops::Deref};
 use zbus::{names::OwnedBusName, Connection};
 
 #[derive(Debug, Clone)]
@@ -71,6 +71,14 @@ impl TrackList {
 			.await
 			.map(|x| x.into_iter().map(Track::from).collect())
 			.map_err(Error::from)
+	}
+
+	/// Returns a list of all available [Track]s and their associated metadata,
+	/// in order.
+	pub async fn detailed_tracks(&self) -> Result<BTreeMap<Track, Metadata>> {
+		let tracks = self.tracks().await?;
+		let metadata = self.get_tracks_metadata(&tracks).await?;
+		Ok(tracks.into_iter().zip(metadata.into_iter()).collect())
 	}
 }
 

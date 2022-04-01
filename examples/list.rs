@@ -77,7 +77,42 @@ async fn main() -> Result<()> {
 			.await
 			.into_diagnostic()
 			.wrap_err_with(|| format!("Failed to get metadata for media player '{}'", name))?;
-		println!("\tMetadata:\n{}", metadata);
+		println!("\tMetadata: {}", metadata);
+		let track_list = media_player
+			.track_list()
+			.await
+			.into_diagnostic()
+			.wrap_err_with(|| format!("Failed to get track list for media player '{}'", name))?;
+		if let Some(track_list) = track_list {
+			let tracks = track_list
+				.detailed_tracks()
+				.await
+				.into_diagnostic()
+				.wrap_err_with(|| {
+					format!("Failed to get detailed tracks for media player '{}'", name)
+				})?;
+			println!("\tTracks:");
+			for (track, metadata) in tracks {
+				println!("\t\t{}", track);
+				if let Some(title) = metadata.title() {
+					println!("\t\t\tTitle: {}", title);
+				}
+				if let Some(album) = metadata.album() {
+					println!("\t\t\tAlbum: {}", album);
+				}
+				if let Some(artists) = metadata.artists() {
+					println!("\t\t\tArtists: {}", artists.join(", "));
+				}
+				if let Some(composers) = metadata.composer() {
+					println!("\t\t\tComposers: {}", composers.join(", "));
+				}
+				if let Some(bpm) = metadata.bpm() {
+					println!("\t\t\tBPM: {}", bpm);
+				}
+			}
+		} else {
+			println!("\tTracks: N/A");
+		}
 	}
 	Ok(())
 }

@@ -25,7 +25,7 @@ impl Metadata {
 	/// `xesam:artist`: The track artist(s).
 	pub fn artists(&self) -> Option<Vec<String>> {
 		self.inner
-			.get("xesam:artists")
+			.get("xesam:artist")
 			.cloned()
 			.and_then(|artists| artists.try_into_array().ok())
 			.map(|artists| {
@@ -233,9 +233,14 @@ impl DerefMut for Metadata {
 
 impl fmt::Display for Metadata {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		writeln!(f, "{{")?;
-		for (k, v) in &self.inner {
-			writeln!(f, "\t{}: {},", k, v)?;
+		write!(f, "{{")?;
+		let mut iter = self.inner.iter().peekable();
+		while let Some((k, v)) = iter.next() {
+			if iter.peek().is_some() {
+				write!(f, "{}: {}, ", k, v)?;
+			} else {
+				write!(f, "{}: {}", k, v)?;
+			}
 		}
 		write!(f, "}}")
 	}
@@ -507,9 +512,14 @@ impl fmt::Display for MetadataValue {
 				write!(f, "]")
 			}
 			Self::Dict(d) => {
-				writeln!(f, "{{")?;
-				for (k, v) in d {
-					writeln!(f, "\t{}: {},", k, v)?;
+				write!(f, "{{")?;
+				let mut iter = d.iter().peekable();
+				while let Some((k, v)) = iter.next() {
+					if iter.peek().is_some() {
+						write!(f, "{}: {}, ", k, v)?;
+					} else {
+						write!(f, "{}: {}", k, v)?;
+					}
 				}
 				write!(f, "}}")
 			}
