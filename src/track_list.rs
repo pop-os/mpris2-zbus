@@ -3,7 +3,7 @@ use crate::{
 	bindings::track_list::TrackListProxy,
 	error::{Error, Result},
 	metadata::Metadata,
-	track::Track,
+	track::TrackId,
 };
 use std::{collections::BTreeMap, ops::Deref};
 use zbus::{names::OwnedBusName, Connection};
@@ -28,7 +28,7 @@ impl TrackList {
 	pub async fn add_track<S: ToString>(
 		&self,
 		uri: S,
-		after: &Track,
+		after: &TrackId,
 		set_as_current: bool,
 	) -> Result<()> {
 		let uri = uri.to_string();
@@ -39,43 +39,39 @@ impl TrackList {
 	}
 
 	/// Gets the metadata of the given tracks.
-	pub async fn get_tracks_metadata<T: AsRef<[Track]>>(&self, tracks: T) -> Result<Vec<Metadata>> {
+	pub async fn get_tracks_metadata<T: AsRef<[TrackId]>>(
+		&self,
+		tracks: T,
+	) -> Result<Vec<Metadata>> {
 		self.proxy
-			.get_tracks_metadata(
-				tracks
-					.as_ref()
-					.iter()
-					.cloned()
-					.map(Track::into_static_path)
-					.collect(),
-			)
+			.get_tracks_metadata(tracks.as_ref().to_vec())
 			.await
 			.map(|x| x.into_iter().map(Metadata::from).collect())
 			.map_err(Error::from)
 	}
 
 	/// Goes to the specified track.
-	pub async fn go_to(&self, track: &Track) -> Result<()> {
+	pub async fn go_to(&self, track: &TrackId) -> Result<()> {
 		self.proxy.go_to(track).await.map_err(Error::from)
 	}
 
 	/// Removes the specified track.
-	pub async fn remove(&self, track: &Track) -> Result<()> {
+	pub async fn remove(&self, track: &TrackId) -> Result<()> {
 		self.proxy.remove_track(track).await.map_err(Error::from)
 	}
 
 	/// Returns a list of all available [Track]s.
-	pub async fn tracks(&self) -> Result<Vec<Track>> {
+	pub async fn tracks(&self) -> Result<Vec<TrackId>> {
 		self.proxy
 			.tracks()
 			.await
-			.map(|x| x.into_iter().map(Track::from).collect())
+			.map(|x| x.into_iter().map(TrackId::from).collect())
 			.map_err(Error::from)
 	}
 
 	/// Returns a list of all available [Track]s and their associated metadata,
 	/// in order.
-	pub async fn detailed_tracks(&self) -> Result<BTreeMap<Track, Metadata>> {
+	pub async fn detailed_tracks(&self) -> Result<BTreeMap<TrackId, Metadata>> {
 		let tracks = self.tracks().await?;
 		let metadata = self.get_tracks_metadata(&tracks).await?;
 		Ok(tracks.into_iter().zip(metadata.into_iter()).collect())

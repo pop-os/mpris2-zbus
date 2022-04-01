@@ -20,6 +20,7 @@
 //!
 //! …consequently `zbus-xmlgen` did not generate code for the above interfaces.
 
+use crate::track::TrackId;
 use zbus::dbus_proxy;
 
 #[dbus_proxy(
@@ -49,11 +50,7 @@ trait Player {
 	fn seek(&self, offset: i64) -> zbus::Result<()>;
 
 	/// SetPosition method
-	fn set_position(
-		&self,
-		track_id: &zbus::zvariant::ObjectPath<'_>,
-		position: i64,
-	) -> zbus::Result<()>;
+	fn set_position(&self, track_id: &TrackId, position: i64) -> zbus::Result<()>;
 
 	/// Stop method
 	fn stop(&self) -> zbus::Result<()>;

@@ -19,6 +19,7 @@
 //!
 //! …consequently `zbus-xmlgen` did not generate code for the above interfaces.
 
+use crate::playlist::{Playlist, PlaylistId};
 use zbus::dbus_proxy;
 
 #[dbus_proxy(
@@ -27,7 +28,7 @@ use zbus::dbus_proxy;
 )]
 trait Playlists {
 	/// ActivatePlaylist method
-	fn activate_playlist(&self, playlist_id: &zbus::zvariant::ObjectPath<'_>) -> zbus::Result<()>;
+	fn activate_playlist(&self, playlist_id: &PlaylistId) -> zbus::Result<()>;
 
 	/// GetPlaylists method
 	fn get_playlists(
@@ -36,20 +37,15 @@ trait Playlists {
 		max_count: u32,
 		order: &str,
 		reverse_order: bool,
-	) -> zbus::Result<Vec<(zbus::zvariant::OwnedObjectPath, String, String)>>;
+	) -> zbus::Result<Vec<Playlist>>;
 
 	/// PlaylistChanged signal
 	#[dbus_proxy(signal)]
-	fn playlist_changed(
-		&self,
-		playlist: (zbus::zvariant::ObjectPath<'_>, &str, &str),
-	) -> zbus::Result<()>;
+	fn playlist_changed(&self, playlist: Playlist) -> zbus::Result<()>;
 
 	/// ActivePlaylist property
 	#[dbus_proxy(property)]
-	fn active_playlist(
-		&self,
-	) -> zbus::Result<(bool, (zbus::zvariant::OwnedObjectPath, String, String))>;
+	fn active_playlist(&self) -> zbus::Result<(bool, Playlist)>;
 
 	/// Orderings property
 	#[dbus_proxy(property)]

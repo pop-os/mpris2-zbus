@@ -19,6 +19,7 @@
 //!
 //! …consequently `zbus-xmlgen` did not generate code for the above interfaces.
 
+use crate::track::TrackId;
 use zbus::dbus_proxy;
 
 #[dbus_proxy(
@@ -27,32 +28,25 @@ use zbus::dbus_proxy;
 )]
 trait TrackList {
 	/// AddTrack method
-	fn add_track(
-		&self,
-		uri: &str,
-		after_track: &zbus::zvariant::ObjectPath<'_>,
-		set_as_current: bool,
-	) -> zbus::Result<()>;
+	fn add_track(&self, uri: &str, after_track: &TrackId, set_as_current: bool)
+		-> zbus::Result<()>;
 
 	/// GetTracksMetadata method
 	fn get_tracks_metadata(
 		&self,
-		track_ids: Vec<zbus::zvariant::ObjectPath<'_>>,
+		track_ids: Vec<TrackId>,
 	) -> zbus::Result<Vec<std::collections::HashMap<String, zbus::zvariant::OwnedValue>>>;
 
 	/// GoTo method
-	fn go_to(&self, track_id: &zbus::zvariant::ObjectPath<'_>) -> zbus::Result<()>;
+	fn go_to(&self, track_id: &TrackId) -> zbus::Result<()>;
 
 	/// RemoveTrack method
-	fn remove_track(&self, track_id: &zbus::zvariant::ObjectPath<'_>) -> zbus::Result<()>;
+	fn remove_track(&self, track_id: &TrackId) -> zbus::Result<()>;
 
 	/// TrackListReplaced signal
 	#[dbus_proxy(signal)]
-	fn track_list_replaced(
-		&self,
-		tracks: Vec<zbus::zvariant::ObjectPath<'_>>,
-		current_track: zbus::zvariant::ObjectPath<'_>,
-	) -> zbus::Result<()>;
+	fn track_list_replaced(&self, tracks: Vec<TrackId>, current_track: TrackId)
+		-> zbus::Result<()>;
 
 	/// CanEditTracks property
 	#[dbus_proxy(property)]
@@ -60,5 +54,5 @@ trait TrackList {
 
 	/// Tracks property
 	#[dbus_proxy(property)]
-	fn tracks(&self) -> zbus::Result<Vec<zbus::zvariant::OwnedObjectPath>>;
+	fn tracks(&self) -> zbus::Result<Vec<TrackId>>;
 }
