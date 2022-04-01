@@ -5,6 +5,7 @@ use crate::{
 	handle_optional,
 	media_player::MediaPlayer,
 	metadata::Metadata,
+	track::Track,
 };
 use std::{
 	fmt::{self, Display},
@@ -49,6 +50,16 @@ impl Player {
 		} else {
 			Ok(false)
 		}
+	}
+
+	/// Sets the current track position.
+	///
+	/// If `track` does not match the id of the currently-playing track, the call is ignored as "stale".
+	pub async fn set_position(&self, track: &Track, position: Duration) -> Result<()> {
+		self.proxy
+			.set_position(track, position.whole_microseconds() as i64)
+			.await
+			.map_err(Error::from)
 	}
 
 	/// How far into the current track the player is.

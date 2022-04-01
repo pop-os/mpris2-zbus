@@ -4,6 +4,8 @@ pub mod error;
 pub mod media_player;
 pub mod metadata;
 pub mod player;
+pub mod track;
+pub mod track_list;
 
 pub(crate) fn handle_optional<T>(input: zbus::Result<T>) -> error::Result<Option<T>> {
 	match input {
