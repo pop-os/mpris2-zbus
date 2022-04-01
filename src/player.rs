@@ -85,6 +85,11 @@ impl Player {
 		handle_optional(self.proxy.rate().await)
 	}
 
+	/// Sets the current rate of playback.
+	pub async fn set_rate(&self, value: f64) -> Result<()> {
+		handle_optional(self.proxy.set_rate(value).await).map(|_| ())
+	}
+
 	/// Returns the minimum supported rate for the player.
 	///
 	/// Not all players support this, and it will return None if this is the case.
@@ -122,6 +127,49 @@ impl Player {
 			.map(|metadata| metadata.into())
 			.map_err(Error::from)
 	}
+
+	/// Whether the current playlist is shuffled or not.
+	///
+	/// A value of false indicates that playback is progressing linearly through a playlist,
+	/// while true means playback is progressing through a playlist in some other order.
+	pub async fn shuffle(&self) -> Result<Option<bool>> {
+		if self.can_control().await? {
+			handle_optional(self.proxy.shuffle().await)
+		} else {
+			Ok(None)
+		}
+	}
+
+	/// Set whether the current playlist is shuffled or not.
+	///
+	/// A value of false indicates that playback is progressing linearly through a playlist,
+	/// while true means playback is progressing through a playlist in some other order.
+	pub async fn set_shuffle(&self, value: bool) -> Result<()> {
+		if self.proxy.can_control().await? {
+			self.proxy.set_shuffle(value).await.map_err(Error::from)
+		} else {
+			Ok(())
+		}
+	}
+
+	/// The current loop / repeat status.
+	pub async fn loop_status(&self) -> Result<Option<LoopStatus>> {
+		if self.proxy.can_control().await? {
+			handle_optional(self.proxy.loop_status().await)
+				.map(|status| status.and_then(|status| LoopStatus::from_str(&status).ok()))
+		} else {
+			Ok(None)
+		}
+	}
+
+	/// Set the current loop / repeat status.
+	pub async fn set_loop_status(&self, value: LoopStatus) -> Result<()> {
+		if self.proxy.can_control().await? {
+			handle_optional(self.proxy.set_loop_status(value.to_string()).await).map(|_| ())
+		} else {
+			Ok(())
+		}
+	}
 }
 
 impl Deref for Player {
@@ -140,8 +188,11 @@ impl From<PlayerProxy<'static>> for Player {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum PlaybackStatus {
+	/// A track is currently playing.
 	Playing,
+	/// A track is currently paused.
 	Paused,
+	/// There is no track currently playing.
 	Stopped,
 }
 
@@ -170,6 +221,46 @@ impl Display for PlaybackStatus {
 				Self::Playing => "Playing",
 				Self::Paused => "Paused",
 				Self::Stopped => "Stopped",
+			}
+		)
+	}
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum LoopStatus {
+	/// The playback will stop when there are no more tracks to play
+	None,
+	/// The current track will start again from the begining once it has finished playing
+	Track,
+	/// The playback loops through a list of tracks
+	Playlist,
+}
+
+impl FromStr for LoopStatus {
+	type Err = Error;
+
+	fn from_str(s: &str) -> Result<Self> {
+		match s.to_lowercase().trim() {
+			"none" => Ok(Self::None),
+			"track" => Ok(Self::Track),
+			"playlist" => Ok(Self::Playlist),
+			_ => Err(Error::InvalidEnum {
+				got: s.to_string(),
+				expected: &["Playing", "Paused", "Stopped"],
+			}),
+		}
+	}
+}
+
+impl Display for LoopStatus {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(
+			f,
+			"{}",
+			match self {
+				Self::None => "None",
+				Self::Track => "Track",
+				Self::Playlist => "Playlist",
 			}
 		)
 	}

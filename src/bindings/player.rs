@@ -114,6 +114,18 @@ trait Player {
 	#[dbus_proxy(property)]
 	fn set_rate(&self, value: f64) -> zbus::Result<()>;
 
+	/// Shuffle property (optional)
+	#[dbus_proxy(property)]
+	fn shuffle(&self) -> zbus::Result<bool>;
+	#[dbus_proxy(property)]
+	fn set_shuffle(&self, value: bool) -> zbus::Result<()>;
+
+	/// LoopStatus property (optional)
+	#[dbus_proxy(property)]
+	fn loop_status(&self) -> zbus::Result<String>;
+	#[dbus_proxy(property)]
+	fn set_loop_status(&self, value: String) -> zbus::Result<()>;
+
 	/// Volume property
 	#[dbus_proxy(property)]
 	fn volume(&self) -> zbus::Result<f64>;
