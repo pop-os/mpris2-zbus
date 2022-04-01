@@ -4,7 +4,6 @@ pub mod error;
 pub mod media_player;
 pub mod metadata;
 pub mod player;
-pub mod playlist;
 pub mod playlists;
 pub mod track;
 pub mod track_list;

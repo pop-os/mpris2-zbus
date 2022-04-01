@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 use miette::{IntoDiagnostic, Result, WrapErr};
-use mpris2_zbus::{media_player::MediaPlayer, playlists::PlaylistOrdering};
+use mpris2_zbus::{media_player::MediaPlayer, playlists::ordering::PlaylistOrdering};
 use zbus::Connection;
 
 #[tokio::main]

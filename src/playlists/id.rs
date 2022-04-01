@@ -1,33 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 use serde::{Deserialize, Serialize};
 use std::{
-	cmp::Ordering,
+	cmp::{Ord, Ordering, PartialOrd},
 	fmt::{self, Display},
 	ops::Deref,
 };
-use zbus::zvariant::{ObjectPath, OwnedObjectPath, Type, Value};
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Type, Serialize, Deserialize, Value)]
-pub struct Playlist {
-	id: PlaylistId,
-	name: String,
-	#[serde(default)]
-	icon: String,
-}
-
-impl Playlist {
-	pub fn id(&self) -> &PlaylistId {
-		&self.id
-	}
-
-	pub fn name(&self) -> &str {
-		&self.name
-	}
-
-	pub fn icon(&self) -> &str {
-		&self.icon
-	}
-}
+use zvariant::{ObjectPath, OwnedObjectPath, Type, Value};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Type, Serialize, Deserialize, Value)]
 pub struct PlaylistId(OwnedObjectPath);

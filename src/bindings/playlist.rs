@@ -19,10 +19,7 @@
 //!
 //! …consequently `zbus-xmlgen` did not generate code for the above interfaces.
 
-use crate::{
-	playlist::{Playlist, PlaylistId},
-	playlists::PlaylistOrdering,
-};
+use crate::playlists::{id::PlaylistId, ordering::PlaylistOrdering, playlist::Playlist};
 use zbus::dbus_proxy;
 
 #[dbus_proxy(
