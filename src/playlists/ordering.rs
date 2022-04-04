@@ -44,9 +44,9 @@ impl<'a> TryFrom<Value<'a>> for PlaylistOrdering {
 	}
 }
 
-impl<'a> Into<Value<'a>> for PlaylistOrdering {
-	fn into(self) -> Value<'a> {
-		Value::Str(self.to_string().into())
+impl<'a> From<PlaylistOrdering> for Value<'a> {
+	fn from(ordering: PlaylistOrdering) -> Self {
+		Value::Str(ordering.to_string().into())
 	}
 }
 
