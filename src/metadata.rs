@@ -203,7 +203,11 @@ impl Metadata {
 		self.inner
 			.get("mpris:length")
 			.cloned()
-			.and_then(|v| v.try_into_int().ok())
+			.and_then(|v| match &v {
+				MetadataValue::Int(i) => Some(*i),
+				MetadataValue::Str(s) => s.parse().ok(),
+				_ => None,
+			})
 			.map(Duration::microseconds)
 	}
 
