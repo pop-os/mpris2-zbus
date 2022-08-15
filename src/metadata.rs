@@ -205,6 +205,7 @@ impl Metadata {
 			.cloned()
 			.and_then(|v| match &v {
 				MetadataValue::Int(i) => Some(*i),
+				MetadataValue::UInt(u) => Some(*u as i64),
 				MetadataValue::Str(s) => s.parse().ok(),
 				_ => None,
 			})
